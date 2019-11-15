@@ -8,6 +8,7 @@ import {KeyValue, DeviceType} from './tstype';
 import Debug from "debug";
 import fs from 'fs';
 import {Utils as ZclUtils} from '../zcl';
+import GreenPower from './greenPower';
 
 // @ts-ignore
 import mixin from 'mixin-deep';
@@ -63,6 +64,7 @@ class Controller extends events.EventEmitter {
     private options: Options;
     private database: Database;
     private adapter: Adapter;
+    private greenPower: GreenPower;
     // eslint-disable-next-line
     private permitJoinTimer: any;
     // eslint-disable-next-line
@@ -99,6 +101,8 @@ class Controller extends events.EventEmitter {
         debug.log(`Injected database: ${this.database != null}, adapter: ${this.adapter != null}`);
         Entity.injectAdapter(this.adapter);
         Entity.injectDatabase(this.database);
+
+        this.greenPower = new GreenPower(this.adapter);
 
         // Register adapter events
         this.adapter.on(AdapterEvents.Events.deviceJoined, this.onDeviceJoined.bind(this));
@@ -142,11 +146,13 @@ class Controller extends events.EventEmitter {
         if (permit && !this.getPermitJoin()) {
             debug.log('Permit joining');
             await this.adapter.permitJoin(254);
+            await this.greenPower.enableCommisioning(254);
 
             // Zigbee 3 networks automatically close after max 255 seconds, keep network open.
             this.permitJoinTimer = setInterval(async (): Promise<void> => {
                 debug.log('Permit joining');
                 await this.adapter.permitJoin(254);
+                await this.greenPower.enableCommisioning(254);
             }, 200 * 1000);
         } else if (permit && this.getPermitJoin()) {
             debug.log('Joining already permitted');
@@ -373,6 +379,12 @@ class Controller extends events.EventEmitter {
         dataType: 'zcl' | 'raw', dataPayload: AdapterEvents.ZclDataPayload | AdapterEvents.RawDataPayload
     ): Promise<void> {
         debug.log(`Received '${dataType}' data '${JSON.stringify(dataPayload)}'`);
+
+        if (this.isZclDataPayload(dataPayload, 'zcl') && dataPayload.frame.Cluster.name === 'greenPower') {
+            console.log(dataPayload.frame.Payload);
+
+            this.greenPower.onZclGreenPowerData(dataPayload);
+        }
 
         const device = Device.byNetworkAddress(dataPayload.networkAddress);
         if (!device) {

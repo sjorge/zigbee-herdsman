@@ -296,6 +296,22 @@ class ZStackAdapter extends Adapter {
         });
     }
 
+    public async sendZclFrameBroadcast(zclFrame: ZclFrame): Promise<void> {
+        return this.queue.execute<void>(async () => {
+            await this.dataRequestExtended(
+                Constants.COMMON.addressMode.ADDR_16BIT, 0xFFFD, 242, 242, zclFrame.Cluster.ID,
+                Constants.AF.DEFAULT_RADIUS, zclFrame.toBuffer(), 10000, 0
+            );
+
+            /**
+             * As a group command is not confirmed and thus immidiately returns
+             * (contrary to network address requests) we will give the
+             * command some time to 'settle' in the network.
+             */
+            await Wait(200);
+        });
+    }
+
     public async lqi(networkAddress: number): Promise<LQI> {
         return this.queue.execute<LQI>(async (): Promise<LQI> => {
             const neighbors: LQINeighbor[] = [];
@@ -506,6 +522,7 @@ class ZStackAdapter extends Adapter {
                         this.waitress.resolve(payload);
                         this.emit(Events.Events.zclData, payload);
                     } catch (error) {
+                        console.log(error);
                         const payload: Events.RawDataPayload = {
                             clusterID: object.payload.clusterid,
                             data: object.payload.data,
