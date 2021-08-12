@@ -1717,6 +1717,7 @@ const Cluster: {
                     {name: 'opereventsrc', type: DataType.uint8},
                     {name: 'opereventcode', type: DataType.uint8},
                     {name: 'userid', type: DataType.uint16},
+
                     {name: 'pin', type: DataType.octetStr},
                     {name: 'zigbeelocaltime', type: DataType.uint32},
                     {name: 'data', type: DataType.uint8},
@@ -1772,7 +1773,7 @@ const Cluster: {
             tuyaMovingState: {ID: 0xf000, type: DataType.enum8},
             tuyaCalibration: {ID: 0xf001, type: DataType.enum8},
             tuyaMotorReversal: {ID: 0xf002, type: DataType.enum8},
-            moesCalibrationTime: { ID: 0xf003, type: DataType.uint16},
+            moesCalibrationTime: {ID: 0xf003, type: DataType.uint16},
             elkoDriveCloseDuration: {ID: 0xE000, type: DataType.uint16, manufacturerCode: ManufacturerCode.ELKO},
             elkoProtectionStatus: {ID: 0xE010, type: DataType.bitmap8, manufacturerCode: ManufacturerCode.ELKO},
             elkoProtectionSensor: {ID: 0xE013, type: DataType.bitmap8, manufacturerCode: ManufacturerCode.ELKO},
