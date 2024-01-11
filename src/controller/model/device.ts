@@ -373,7 +373,8 @@ class Device extends Entity {
             modelId: this.modelID, epList, endpoints, appVersion: this.applicationVersion,
             stackVersion: this.stackVersion, hwVersion: this.hardwareVersion, dateCode: this.dateCode,
             swBuildId: this.softwareBuildID, zclVersion: this.zclVersion, interviewCompleted: this.interviewCompleted,
-            meta: this.meta, lastSeen: this.lastSeen, checkinInterval: this.checkinInterval
+            meta: this.meta, lastSeen: this.lastSeen, checkinInterval: this.checkinInterval,
+            pendingRequestTimeout: this.pendingRequestTimeout,
         };
     }
 
