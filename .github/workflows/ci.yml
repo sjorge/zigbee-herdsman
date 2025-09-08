@@ -41,7 +41,7 @@ jobs:
               run: pnpm run test:coverage -- --testTimeout=10000
 
             - name: Bench
-              uses: CodSpeedHQ/action@v3
+              uses: CodSpeedHQ/action@v4
               with:
                 run: pnpm run bench
                 token: ${{ secrets.CODSPEED_TOKEN }}
